@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="primary">#0a7ea4</color>
+    <color name="primary_dark">#005a7a</color>
+    <color name="accent">#FF6B6B</color>
+    <color name="background">#151718</color>
+    <color name="surface">#1e2022</color>
+    <color name="foreground">#ECEDEE</color>
+    <color name="muted">#9BA1A6</color>
+    <color name="border">#334155</color>
+    <color name="success">#4ADE80</color>
+    <color name="warning">#FBBF24</color>
+    <color name="error">#F87171</color>
+    
+    <!-- Code highlighting -->
+    <color name="instruction_blue">#60A5FA</color>
+    <color name="register_red">#F87171</color>
+    <color name="string_green">#34D399</color>
+    <color name="comment_gray">#9BA1A6</color>
+    <color name="number_amber">#FBBF24</color>
+</resources>

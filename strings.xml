@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SO Analyzer</string>
+    <string name="file_manager">File Manager</string>
+    <string name="analyzer">Analyzer</string>
+    <string name="code">Code</string>
+    <string name="sections">Sections</string>
+    <string name="symbols">Symbols</string>
+    <string name="strings">Strings</string>
+    <string name="search">Search</string>
+    <string name="back">Back</string>
+    <string name="no_files">No files or folders</string>
+    <string name="permission_required">Storage Permission Required</string>
+    <string name="permission_message">This app needs access to all files to analyze .so files. Please grant the permission in Settings.</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="search_hint">Search instructions, registers, strings...</string>
+    <string name="search_button">Search</string>
+    <string name="results_found">Found %d results</string>
+    <string name="folder">Folder</string>
+    <string name="file_size">%s • %s</string>
+</resources>

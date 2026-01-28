@@ -1,0 +1,125 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-levels: 34
+        ndk-version: 26.1.10909125
+        cmake-version: 3.22.1
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Validate Gradle wrapper
+      run: ./gradlew wrapper --gradle-version 8.1.0
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --stacktrace
+
+    - name: Build Release APK (Unsigned)
+      run: ./gradlew assembleRelease --stacktrace
+
+    - name: Create Debug Keystore
+      run: |
+        keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey \
+          -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+          -dname "CN=Android Debug,O=Android,C=US"
+
+    - name: Sign Release APK
+      run: |
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+          -keystore debug.keystore -storepass android -keypass android \
+          app/build/outputs/apk/release/app-release-unsigned.apk androiddebugkey
+
+    - name: Rename signed APK
+      run: |
+        mv app/build/outputs/apk/release/app-release-unsigned.apk \
+           app/build/outputs/apk/release/app-release.apk
+
+    - name: Verify APK signatures
+      run: |
+        jarsigner -verify -verbose -certs app/build/outputs/apk/debug/app-debug.apk
+        jarsigner -verify -verbose -certs app/build/outputs/apk/release/app-release.apk
+
+    - name: Get APK info
+      run: |
+        echo "=== Debug APK ===" && ls -lh app/build/outputs/apk/debug/app-debug.apk
+        echo "=== Release APK ===" && ls -lh app/build/outputs/apk/release/app-release.apk
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release
+        path: app/build/outputs/apk/release/app-release.apk
+        retention-days: 30
+
+    - name: Create Release (on tag)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          app/build/outputs/apk/debug/app-debug.apk
+          app/build/outputs/apk/release/app-release.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build Summary
+      if: always()
+      run: |
+        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### APK Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          echo "✅ Debug APK: $(ls -lh app/build/outputs/apk/debug/app-debug.apk | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Debug APK: Not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+          echo "✅ Release APK: $(ls -lh app/build/outputs/apk/release/app-release.apk | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Release APK: Not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Download" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "APK artifacts are available in the Artifacts section of this workflow run." >> $GITHUB_STEP_SUMMARY

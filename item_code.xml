@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@color/background">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/address"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/muted"
+        android:fontFamily="monospace" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/instruction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="12sp"
+        android:textColor="@color/instruction_blue"
+        android:fontFamily="monospace"
+        android:layout_marginStart="8dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/operands"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="12sp"
+        android:textColor="@color/string_green"
+        android:fontFamily="monospace"
+        android:layout_marginStart="8dp" />
+
+</LinearLayout>
